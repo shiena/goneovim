@@ -3015,11 +3015,6 @@ func (s *Screen) windowFloatPosition(args []interface{}) {
 		win.widget.SetParent(editor.wsWidget)
 		win.isFloatWin = true
 
-		if win.isExternal {
-			win.deleteExternalWin()
-			win.isExternal = false
-		}
-
 		anchorwin, ok := s.getWindow(anchorGrid)
 		if !ok {
 			continue
@@ -3027,30 +3022,6 @@ func (s *Screen) windowFloatPosition(args []interface{}) {
 
 		anchorposx := anchorwin.pos[0]
 		anchorposy := anchorwin.pos[1]
-
-		if anchorwin.isExternal {
-			win.widget.SetParent(anchorwin.widget)
-			anchorposx = 0
-			anchorposy = 0
-		}
-
-		// In multigrid ui, the completion float window on the message window appears to be misaligned.
-		// Therefore, a hack to workaround this problem is implemented on the GUI front-end side.
-		// This workaround assumes that the anchor window for the completion window on the message window is always a global grid.
-		pumInMsgWin := false
-		if anchorwin.grid == 1 && !(s.cursor[0] == 0 && s.cursor[1] == 0) && win.id == -1 {
-			cursorgridwin, ok := s.getWindow(s.ws.cursor.gridid)
-			if !ok {
-				continue
-			}
-			if cursorgridwin.isMsgGrid {
-				anchorwin = cursorgridwin
-				anchorRow = cursorgridwin.pos[0]
-				anchorposx = cursorgridwin.pos[0]
-				anchorposy = cursorgridwin.pos[1]
-			}
-			pumInMsgWin = true
-		}
 
 		var x, y int
 		switch win.anchor {
@@ -3062,28 +3033,7 @@ func (s *Screen) windowFloatPosition(args []interface{}) {
 			y = anchorposy + anchorRow
 		case "SW":
 			x = anchorposx + anchorCol
-			// In multigrid ui, the completion float window position information is not correct.
-			// Therefore, we implement a hack to compensate for this.
-			// ref: src/nvim/popupmenu.c:L205-, L435-
-
-			if win.id == -1 && !pumInMsgWin {
-
-				row := 0
-				contextLine := 0
-				if anchorwin.rows - s.cursor[0] >= 2 {
-					contextLine = 2
-				} else {
-					contextLine = anchorwin.rows - s.cursor[0]
-				}
-				if anchorposy+s.cursor[0] >= win.rows+contextLine {
-					row = anchorRow + win.rows
-				} else {
-					row = -anchorposy
-				}
-				y = anchorposy + row
-			} else {
-				y = anchorposy + anchorRow - win.rows
-			}
+			y = anchorposy + anchorRow - win.rows
 		case "SE":
 			x = anchorposx + anchorCol - win.cols
 			y = anchorposy + anchorRow - win.rows
@@ -3094,7 +3044,6 @@ func (s *Screen) windowFloatPosition(args []interface{}) {
 
 		win.move(x, y)
 		win.setShadow()
-		win.getWinblend()
 		win.show()
 
 		// Redraw anchor window.Because shadows leave dust before and after float window drawing.
