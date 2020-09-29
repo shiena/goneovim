@@ -39,7 +39,7 @@ jobs:
 
     - name: Configure Qt
       run: |
-        cd ${{ github.workspace }}/Qt && ./configure -prefix /opt/Qt/${{ matrix.qtversion }}/gcc_64 -confirm-license -opensource -static -qt-zlib -qt-libpng -qt-libjpeg -qt-xcb -sysconfdir /etc/xdg -dbus-runtime -openssl-runtime -opengl -optimize-size -skip qtwebengine -skip qtfeedback -skip qtpim -skip qtdocgallery -nomake tests -nomake examples && make -j $(grep -c ^processor /proc/cpuinfo) && make install -j $(grep -c ^processor /proc/cpuinfo)
+        cd ${{ github.workspace }}/Qt && ./configure -prefix ${{ github.workspace }}/Qt/${{ matrix.qtversion }}/gcc_64 -confirm-license -opensource -static -qt-zlib -qt-libpng -qt-libjpeg -qt-xcb -sysconfdir /etc/xdg -dbus-runtime -openssl-runtime -opengl -optimize-size -skip qtwebengine -skip qtfeedback -skip qtpim -skip qtdocgallery -nomake tests -nomake examples && make -j $(grep -c ^processor /proc/cpuinfo) && make install -j $(grep -c ^processor /proc/cpuinfo)
 
     - name: Get Qt binding for Go
       run: |
