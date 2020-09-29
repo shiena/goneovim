@@ -167,6 +167,9 @@ jobs:
       QT_DIR: ${{ github.workspace }}\Qt
       QT_MSVC: true
       QT_STATIC: true
+      QMAKE_CFLAGS_RELEASE: "-O2 -MD -MP2"
+      #QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO += -O2 -MD -Zi -MP2
+      QMAKE_CFLAGS_DEBUG: "-Zi -MDd -MP2"
       GO111MODULE: off
       #CGO_ENABLED: 1
     steps:
@@ -200,6 +203,13 @@ jobs:
         arch: 'win64_msvc2017_64'
         install-deps: 'true'
         dir: ${{ github.workspace }}
+
+
+    - name: Configure Qt
+      run: |
+        cd ${{ github.workspace }}/Qt
+        .\configure -release -opensource -shared -ltcg -no-fast -exceptions -accessibility -stl -qt-sql-sqlite -no-qt3support -no-openvg -platform win32-msvc2010 -graphicssystem raster -qt-zlib -qt-gif -qt-libpng -qt-libmng -qt-libtiff -qt-libjpeg -no-dsp -no-vcproj -incredibuild-xge -plugin-manifests -qmake -process -rtti -mmx –3dnow -sse -sse2 -openssl -no-dbus -phonon -phonon-backend -multimedia -audio-backend -webkit -script -scripttools -declarative -arch windows -qt-style-windows -qt-style-windowsxp -qt-style-windowsvista -no-style-plastique -no-style-cleanlooks -no-style-motif -no-style-cde -no-style-windowsce -no-style-windowsmobile -no-style-s60 -native-gestures
+      shell: cmd
 
     - name: Install Go
       continue-on-error: true
