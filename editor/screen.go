@@ -2199,6 +2199,7 @@ func (w *Window) updateLine(col, row int, cells []interface{}) {
 				"row", fmt.Sprintf("%d", row),
 				"col", fmt.Sprintf("%d", col),
 				"char", line[col].char,
+				"hl id", line[col].highlight.id,
 				"hlName", line[col].highlight.hlName,
 				"hl fg RGB", line[col].highlight.fg().String(),
 				"hl bg RGB", line[col].highlight.bg().String(),
