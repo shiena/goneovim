@@ -63,8 +63,8 @@ jobs:
         cd ${{ github.workspace }}/src/github.com/${{ github.repository }}/cmd/goneovim
         $(go env GOPATH)/bin/qtmoc
   
-    - name: Test
-      run: go test github.com/${{ github.repository }}/editor
+    # - name: Test
+    #   run: go test github.com/${{ github.repository }}/editor
   
     - name: Build
       run: |
@@ -137,8 +137,8 @@ jobs:
         cd ${{ github.workspace }}/src/github.com/${{ github.repository }}/cmd/goneovim
         $(go env GOPATH)/bin/qtmoc
   
-    - name: Test
-      run: go test github.com/${{ github.repository }}/editor
+    # - name: Test
+    #   run: go test github.com/${{ github.repository }}/editor
   
     - name: Build
       run: |
