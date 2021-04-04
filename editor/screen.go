@@ -2195,6 +2195,14 @@ func (w *Window) updateLine(col, row int, cells []interface{}) {
 					line[col].highlight = w.s.hlAttrDef[hl]
 				}
 			}
+			editor.putLog(
+				"row", fmt.Sprintf("%d", row),
+				"col", fmt.Sprintf("%d", col),
+				"char", line[col].char,
+				"hlName", line[col].highlight.hlName,
+				"hl fg RGB", line[col].highlight.fg().String(),
+				"hl bg RGB", line[col].highlight.bg().String(),
+			)
 
 			// Detect popupmenu
 			if line[col].highlight.uiName == "Pmenu" ||
