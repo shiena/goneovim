@@ -30,6 +30,13 @@ func fontSizeNew(font *gui.QFont) (int, int, float64, float64, float64) {
 	h := fontMetrics.Height()
 	truewidth := fontMetrics.HorizontalAdvance("w", -1)
 
+	debugwidth1 := fontMetrics.HorizontalAdvance(" ", -1)
+	font.SetBold(true)
+	fontMetrics2 := gui.NewQFontMetricsF(font)
+	debugwidth2 := fontMetrics2.HorizontalAdvance(" ", -1)
+	fmt.Println(debugwidth1, debugwidth2)
+	font.SetBold(false)
+
 	// On Windows, it may take a long time (~500ms) to drawing CJK characters for qpainter.
 	// Therefore, we will run this process in concurrently in the background of attaching to neovim.
 	// This issue may also be related to the following.
