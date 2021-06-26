@@ -34,7 +34,7 @@ func fontSizeNew(font *gui.QFont) (int, int, float64, float64, float64) {
 	font.SetBold(true)
 	fontMetrics2 := gui.NewQFontMetricsF(font)
 	debugwidth2 := fontMetrics2.HorizontalAdvance(" ", -1)
-	fmt.Println(debugwidth1, debugwidth2)
+	editor.putLog("font check:", debugwidth1, debugwidth2)
 	font.SetBold(false)
 
 	// On Windows, it may take a long time (~500ms) to drawing CJK characters for qpainter.
