@@ -843,15 +843,15 @@ func (c *Cursor) animateMove() {
 
 		c.updateRegion()
 	})
-	d := math.Sqrt(
-		math.Pow((c.x-c.oldx), 2) + math.Pow((c.y-c.oldy), 2),
-	)
-	f := 20 * math.Pow(
-		math.Atan(d/200),
-		2,
-	)
-	duration := editor.config.Cursor.Duration + int(f)
-	a.SetDuration(int(duration))
+	// d := math.Sqrt(
+	// 	math.Pow((c.x-c.oldx), 2) + math.Pow((c.y-c.oldy), 2),
+	// )
+	// f := 20 * math.Pow(
+	// 	math.Atan(d/200),
+	// 	2,
+	// )
+	// duration := editor.config.Cursor.Duration + int(f)
+	a.SetDuration(int(100))
 	a.SetStartValue(core.NewQVariant10(float64(0.1)))
 	a.SetEndValue(core.NewQVariant10(1))
 	a.SetEasingCurve(core.NewQEasingCurve(core.QEasingCurve__InOutCirc))
