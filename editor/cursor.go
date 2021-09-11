@@ -448,6 +448,8 @@ func (c *Cursor) updateCursorShape() {
 		return
 	}
 
+	editor.putLog("update cursor shape 1")
+
 	if c.modeInfoModeIdx != c.modeIdx || c.isNeedUpdateModeInfo {
 		c.modeInfoModeIdx = c.modeIdx
 
@@ -505,12 +507,16 @@ func (c *Cursor) updateCursorShape() {
 		c.isNeedUpdateModeInfo = false
 	}
 
+	editor.putLog("update cursor shape 2")
+
 	height := c.font.height
 	width := int(math.Trunc(c.font.truewidth))
 	if !c.normalWidth {
 		width = width * 2
 	}
 	p := float64(c.cellPercentage) / float64(100)
+
+	editor.putLog("update cursor shape 3")
 
 	switch c.cursorShape {
 	case "horizontal":
@@ -530,6 +536,8 @@ func (c *Cursor) updateCursorShape() {
 		c.shift = 0
 	}
 
+	editor.putLog("update cursor shape 4")
+
 	if width == 0 {
 		width = 1
 	}
@@ -537,23 +545,32 @@ func (c *Cursor) updateCursorShape() {
 		height = 1
 	}
 
+	editor.putLog("update cursor shape 5")
+
 	if c.blinkWait != 0 {
 		c.brend = 0.0
 		c.timer.Start(c.blinkWait)
 	}
+
+	editor.putLog("update cursor shape 6")
 
 	if !(c.width == width && c.height == height) {
 		c.width = width
 		c.height = height
 	}
 
+	editor.putLog("update cursor shape 7")
+
 }
 
 func (c *Cursor) updateContent() {
 
+	editor.putLog("update content 1")
 	if c.mode != c.ws.mode {
 		c.mode = c.ws.mode
 	}
+
+	editor.putLog("update content 2")
 
 	if c.ws.terminalMode {
 		c.Hide()
@@ -562,14 +579,20 @@ func (c *Cursor) updateContent() {
 		c.Show()
 	}
 
+	editor.putLog("update content 3")
+
 	win, ok := c.ws.screen.getWindow(c.gridid)
 	if !ok {
 		return
 	}
 
+	editor.putLog("update content 4")
+
 	charCache := win.getCache()
 	c.charCache = &charCache
 	c.devicePixelRatio = win.devicePixelRatio
+
+	editor.putLog("update content 5")
 
 	row := c.ws.screen.cursor[0]
 	col := c.ws.screen.cursor[1]
@@ -581,10 +604,14 @@ func (c *Cursor) updateContent() {
 		winy = 0
 	}
 
+	editor.putLog("update content 6")
+
 	winbordersize := 0
 	if win.isExternal {
 		winbordersize = EXTWINBORDERSIZE
 	}
+
+	editor.putLog("update content 7")
 
 	if row >= len(win.content) ||
 		col >= len(win.content[0]) ||
@@ -602,7 +629,11 @@ func (c *Cursor) updateContent() {
 		}
 	}
 
+	editor.putLog("update content 8")
+
 	c.updateCursorShape()
+
+	editor.putLog("update content 9")
 
 	if c.ws.palette != nil {
 		if c.ws.palette.widget.IsVisible() {
@@ -615,6 +646,8 @@ func (c *Cursor) updateContent() {
 		return
 	}
 
+	editor.putLog("update content 10")
+
 	res := 0
 	if win.isMsgGrid {
 		res = win.s.widget.Height() - win.rows*font.lineHeight
@@ -623,17 +656,26 @@ func (c *Cursor) updateContent() {
 		res = 0
 	}
 
+	editor.putLog("update content 11")
+
 	// Set smooth scroll offset
 	scrollPixels := 0
 	if editor.config.Editor.LineToScroll == 1 {
 		scrollPixels += win.scrollPixels[1]
 	}
 
+	editor.putLog("update content 12")
+
 	x := float64(col+winx)*font.truewidth + float64(winbordersize)
 	y := float64((row+winy)*font.lineHeight) + float64(font.lineSpace)/2.0 + float64(c.shift+scrollPixels+res+winbordersize)
 
+	editor.putLog("update content 13")
+
 	isStopScroll := (win.lastScrollphase == core.Qt__ScrollEnd)
 	c.move(win)
+
+	editor.putLog("update content 14")
+
 	if !(c.x == x && c.y == y) {
 		// If the cursor has not finished its animated movement
 		if c.deltax != 0 || c.deltay != 0 {
@@ -649,6 +691,8 @@ func (c *Cursor) updateContent() {
 			c.oldx = c.x
 			c.oldy = c.y
 		}
+
+	editor.putLog("update content 15")
 		c.x = x
 		c.y = y
 		c.doAnimate = true
@@ -656,7 +700,11 @@ func (c *Cursor) updateContent() {
 		if !isStopScroll {
 			c.doAnimate = false
 		}
+
+	editor.putLog("update content 16")
 		c.animateMove()
+
+	editor.putLog("update content 17")
 	}
 }
 

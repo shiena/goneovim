@@ -863,43 +863,66 @@ func (s *Screen) resizeIndependentFontGrid(win *Window, oldCols, oldRows int) {
 }
 
 func (s *Screen) gridCursorGoto(args []interface{}) {
-	for _, arg := range args {
+	for k, arg := range args {
+
+		editor.putLog("grid_cursor_goto", k, " 1")
 		gridid := util.ReflectToInt(arg.([]interface{})[0])
 
 		x := util.ReflectToInt(arg.([]interface{})[1])
 		y := util.ReflectToInt(arg.([]interface{})[2])
 
+		editor.putLog("grid_cursor_goto", k, " 2")
+
 		if isSkipGlobalId(gridid) {
 			continue
 		}
+
+		editor.putLog("grid_cursor_goto", k, " 3")
 
 		win, ok := s.getWindow(gridid)
 		if !ok {
 			continue
 		}
 
+		editor.putLog("grid_cursor_goto", k, " 4")
+
 		// Suppress unnecessary detours of the smooth cursor.
 		if win.isMsgGrid && x == 0 && y == 0 {
 			continue
 		}
+
+		editor.putLog("grid_cursor_goto", k, " 5")
+
 		if win.isMsgGrid && editor.config.Editor.ExtCmdline {
 			continue
 		}
 
+		editor.putLog("grid_cursor_goto", k, " 6")
+
 		s.cursor[0] = x
 		s.cursor[1] = y
+
+		editor.putLog("grid_cursor_goto", k, " 7")
 
 		if s.ws.cursor.gridid != gridid {
 			if !win.isMsgGrid {
 				s.ws.cursor.bufferGridid = gridid
 
 			}
+
+		editor.putLog("grid_cursor_goto", k, " 8")
 			s.ws.cursor.gridid = gridid
+
+		editor.putLog("grid_cursor_goto", k, " 9")
 			s.ws.cursor.font = win.getFont()
+
+		editor.putLog("grid_cursor_goto", k, " 10")
 			win.raise()
+		editor.putLog("grid_cursor_goto", k, " 11")
 
 			// reset smooth scroll scrolling offset
 			win.scrollPixels2 = 0
+		editor.putLog("grid_cursor_goto", k, " 12")
 
 		}
 	}
