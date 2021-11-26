@@ -272,7 +272,7 @@ func (c *Cursor) paint(event *gui.QPaintEvent) {
 	if c.width > int(font.truewidth/2.0) {
 		// Draw cursor foreground
 		if editor.config.Editor.CachedDrawing {
-			var image *gui.QImage
+			var image *gui.QPixmap
 			charCache := *c.charCache
 			imagev, err := charCache.get(HlChars{
 				text:   c.text,
@@ -284,9 +284,9 @@ func (c *Cursor) paint(event *gui.QPaintEvent) {
 				image = c.newCharCache(c.text, c.fg, c.normalWidth)
 				c.setCharCache(c.text, c.fg, image)
 			} else {
-				image = imagev.(*gui.QImage)
+				image = imagev.(*gui.QPixmap)
 			}
-			p.DrawImage7(
+			p.DrawPixmap7(
 				core.NewQPointF3(
 					c.x,
 					c.y,
@@ -316,7 +316,7 @@ func (c *Cursor) paint(event *gui.QPaintEvent) {
 	p.DestroyQPainter()
 }
 
-func (c *Cursor) newCharCache(text string, fg *RGBA, isNormalWidth bool) *gui.QImage {
+func (c *Cursor) newCharCache(text string, fg *RGBA, isNormalWidth bool) *gui.QPixmap {
 	font := c.font
 
 	width := float64(len(text)) * font.italicWidth
@@ -326,13 +326,14 @@ func (c *Cursor) newCharCache(text string, fg *RGBA, isNormalWidth bool) *gui.QI
 
 	// QImage default device pixel ratio is 1.0,
 	// So we set the correct device pixel ratio
-	image := gui.NewQImage3(
-		int(c.devicePixelRatio*width),
-		int(c.devicePixelRatio*float64(font.height)),
-		gui.QImage__Format_ARGB32_Premultiplied,
+	image := gui.NewQPixmap2(
+		core.NewQSize2(
+			int(c.devicePixelRatio*width),
+			int(c.devicePixelRatio*float64(font.height)),
+		),
 	)
 	image.SetDevicePixelRatio(c.devicePixelRatio)
-	image.Fill3(core.Qt__transparent)
+	image.Fill(transparentColor)
 
 	pi := gui.NewQPainter2(image)
 	pi.SetPen2(fg.QColor())
@@ -360,7 +361,7 @@ func (c *Cursor) newCharCache(text string, fg *RGBA, isNormalWidth bool) *gui.QI
 	return image
 }
 
-func (c *Cursor) setCharCache(text string, fg *RGBA, image *gui.QImage) {
+func (c *Cursor) setCharCache(text string, fg *RGBA, image *gui.QPixmap) {
 	c.charCache.set(
 		HlChars{
 			text:   text,
