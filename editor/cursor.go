@@ -599,7 +599,7 @@ func (c *Cursor) updateContent(win *Window) {
 		scrollPixels += win.scrollPixels[1]
 	}
 
-	x := float64(col+winx)*font.cellwidth + float64(winbordersize)
+	x := float64(col+winx)*font.cellwidth + float64(winbordersize) + float64(win.scrollPixels[0])
 	y := float64((row+winy)*font.lineHeight) + float64(font.lineSpace)/2.0 + float64(c.shift+scrollPixels+res+winbordersize)
 
 	isStopScroll := (win.lastScrollphase == core.Qt__ScrollEnd)

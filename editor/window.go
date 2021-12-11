@@ -245,7 +245,9 @@ func (w *Window) paint(event *gui.QPaintEvent) {
 	// This is to suppress flickering in smooth scroll
 	dx := math.Abs(float64(w.scrollPixels[0]))
 	dy := math.Abs(float64(w.scrollPixels[1]))
-	if dx >= font.cellwidth {
+	horizontalScrollDistanse := font.cellwidth
+	// horizontalScrollDistanse := font.cellwidth * 6
+	if dx >= horizontalScrollDistanse {
 		w.scrollPixels[0] = 0
 	}
 	if dy >= float64(font.lineHeight) {
@@ -524,7 +526,7 @@ func (w *Window) drawIndentline(p *gui.QPainter, x int, y int, b bool) {
 		scrollPixels += w.scrollPixels[1]
 	}
 
-	X := float64(x) * font.cellwidth
+	X := float64(x) * font.cellwidth + float64(w.scrollPixels[0])
 	Y := float64(y*font.lineHeight) + float64(scrollPixels)
 	var color *RGBA = editor.colors.indentGuide
 	var lineWeight float64 = 1
@@ -902,12 +904,14 @@ func (w *Window) wheelEvent(event *gui.QWheelEvent) {
 	if editor.config.Editor.DisableHorizontalScroll {
 		return
 	}
-	if vert != 0 {
-		return
-	}
 
-	if horiz != 0 {
-		w.s.ws.nvim.InputMouse("wheel", action, mod, w.grid, row, col)
+	// w.s.ws.nvim.InputMouse("wheel", action, mod, w.grid, row, col)
+	if horiz > 0 {
+		go w.s.ws.nvim.Input("zh")
+		// go w.s.ws.nvim.Input("<ScrollWheelLeft>")
+	} else if horiz < 0 {
+		go w.s.ws.nvim.Input("zl")
+		// go w.s.ws.nvim.Input("<ScrollWheelRight>")
 	}
 
 	event.Accept()
@@ -933,6 +937,8 @@ func (w *Window) focusGrid() {
 func (w *Window) smoothUpdate(v, h int, isStopScroll bool) (int, int) {
 	var vert, horiz int
 	font := w.getFont()
+	horizontalScrollDistanse := font.cellwidth
+	// horizontalScrollDistanse := font.cellwidth * 6
 
 	if isStopScroll {
 		w.scrollPixels[0] = 0
@@ -947,14 +953,14 @@ func (w *Window) smoothUpdate(v, h int, isStopScroll bool) (int, int) {
 	if h < 0 && w.scrollPixels[0] > 0 {
 		w.scrollPixels[0] = 0
 	}
-	// if v < 0 && w.scrollPixels[1] > 0 {
-	// 	w.scrollPixels[1] = 0
-	// }
+	if v < 0 && w.scrollPixels[1] > 0 {
+		w.scrollPixels[1] = 0
+	}
 
 	dx := math.Abs(float64(w.scrollPixels[0]))
 	dy := math.Abs(float64(w.scrollPixels[1]))
 
-	if dx < font.cellwidth {
+	if dx < horizontalScrollDistanse {
 		w.scrollPixels[0] += h
 	}
 	if dy < float64(font.lineHeight) {
@@ -964,8 +970,11 @@ func (w *Window) smoothUpdate(v, h int, isStopScroll bool) (int, int) {
 	dx = math.Abs(float64(w.scrollPixels[0]))
 	dy = math.Abs(float64(w.scrollPixels[1]))
 
-	if dx >= font.cellwidth {
-		horiz = int(float64(w.scrollPixels[0]) / font.cellwidth)
+
+	if dx >= horizontalScrollDistanse {
+		horiz = int(float64(w.scrollPixels[0]) / horizontalScrollDistanse)
+		// NOTE: Reset to 0 after paint event is complete.
+		//       This is to suppress flickering.
 	}
 	if dy >= float64(font.lineHeight) {
 		vert = int(float64(w.scrollPixels[1]) / float64(font.lineHeight))
@@ -975,7 +984,7 @@ func (w *Window) smoothUpdate(v, h int, isStopScroll bool) (int, int) {
 
 	// w.update()
 	// w.s.ws.cursor.update()
-	if !(dx >= font.cellwidth || dy > float64(font.lineHeight)) {
+	if !(dx >= horizontalScrollDistanse || dy > float64(font.lineHeight)) {
 		w.update()
 		w.s.ws.cursor.update()
 	}
@@ -1075,6 +1084,9 @@ func (win *Window) updateGridContent(row, colStart int, cells []interface{}) {
 	}
 
 	// Suppresses flickering during smooth scrolling
+	if win.scrollPixels[0] != 0 {
+		win.scrollPixels[0] = 0
+	}
 	if win.scrollPixels[1] != 0 {
 		win.scrollPixels[1] = 0
 	}
@@ -1409,6 +1421,9 @@ func (w *Window) scroll(count int) {
 	}
 
 	// Suppresses flickering during smooth scrolling
+	if w.scrollPixels[0] != 0 {
+		w.scrollPixels[0] = 0
+	}
 	if w.scrollPixels[1] != 0 {
 		w.scrollPixels[1] = 0
 	}
@@ -1453,7 +1468,7 @@ func (w *Window) update() {
 	start := w.queueRedrawArea[1]
 	end := w.queueRedrawArea[3]
 	// Update all lines when using the wheel scroll or indent guide feature.
-	if w.scrollPixels[1] != 0 || editor.config.Editor.IndentGuide || w.s.name == "minimap" {
+	if w.scrollPixels[0] != 0 || w.scrollPixels[1] != 0 || editor.config.Editor.IndentGuide || w.s.name == "minimap" {
 		start = 0
 		end = w.rows
 	}
@@ -1490,6 +1505,10 @@ func (w *Window) update() {
 		// If scroll is smooth with touchpad
 		if w.scrollPixels[1] != 0 {
 			width = w.maxLenContent
+			drawWithSingleRect = true
+		}
+		if w.scrollPixels[0] != 0 {
+			width = w.cols
 			drawWithSingleRect = true
 		}
 		// If scroll is smooth
@@ -1829,7 +1848,7 @@ func (w *Window) drawText(p *gui.QPainter, y int, col int, cols int) {
 					// 	float64(x)*wsfont.cellwidth,
 					// 	float64(y*wsfont.lineHeight+wsfont.shift+scrollPixels),
 					// ),
-					int(float64(x)*wsfont.cellwidth),
+					int(float64(x)*wsfont.cellwidth)+w.scrollPixels[0],
 					y*wsfont.lineHeight+wsfont.shift+scrollPixels,
 					line[x].char,
 					line[x].highlight,
@@ -1844,7 +1863,7 @@ func (w *Window) drawText(p *gui.QPainter, y int, col int, cols int) {
 					// 	float64(x)*wsfont.cellwidth,
 					// 	float64(y*wsfont.lineHeight+scrollPixels),
 					// ),
-					int(float64(x)*wsfont.cellwidth),
+					int(float64(x)*wsfont.cellwidth)+w.scrollPixels[0],
 					y*wsfont.lineHeight+scrollPixels,
 					line[x].char,
 					line[x].highlight,
@@ -1923,7 +1942,7 @@ func (w *Window) drawText(p *gui.QPainter, y int, col int, cols int) {
 				w.drawTextInPos(
 					p,
 					// pointf,
-					int(float64(pos)*wsfont.cellwidth),
+					int(float64(pos)*wsfont.cellwidth)+w.scrollPixels[0],
 					y*wsfont.lineHeight+wsfont.shift+scrollPixels,
 					text,
 					highlight,
@@ -1933,7 +1952,7 @@ func (w *Window) drawText(p *gui.QPainter, y int, col int, cols int) {
 				w.drawTextInPosWithCache(
 					p,
 					// pointf,
-					int(float64(pos)*wsfont.cellwidth),
+					int(float64(pos)*wsfont.cellwidth)+w.scrollPixels[0],
 					y*wsfont.lineHeight+scrollPixels,
 					text,
 					highlight,
@@ -1963,7 +1982,7 @@ func (w *Window) drawText(p *gui.QPainter, y int, col int, cols int) {
 					// 	float64(x)*wsfont.cellwidth,
 					// 	float64(y*wsfont.lineHeight+wsfont.shift+scrollPixels),
 					// ),
-					int(float64(x)*wsfont.cellwidth),
+					int(float64(x)*wsfont.cellwidth)+w.scrollPixels[0],
 					y*wsfont.lineHeight+wsfont.shift+scrollPixels,
 					line[x].char,
 					line[x].highlight,
@@ -1976,7 +1995,7 @@ func (w *Window) drawText(p *gui.QPainter, y int, col int, cols int) {
 					// 	float64(x)*wsfont.cellwidth,
 					// 	float64(y*wsfont.lineHeight+scrollPixels),
 					// ),
-					int(float64(x)*wsfont.cellwidth),
+					int(float64(x)*wsfont.cellwidth)+w.scrollPixels[0],
 					y*wsfont.lineHeight+scrollPixels,
 					line[x].char,
 					line[x].highlight,
@@ -2109,7 +2128,7 @@ func (w *Window) newDecorationCache(char string, highlight *Highlight, isNormalW
 	if highlight.strikethrough {
 		Y := float64(0*font.lineHeight+scrollPixels) + float64(font.ascent)*0.65 + float64(font.lineSpace/2)
 		pi.FillRect5(
-			int(start),
+			int(start)+w.scrollPixels[0],
 			int(Y),
 			int(math.Ceil(font.cellwidth)),
 			weight,
@@ -2118,7 +2137,7 @@ func (w *Window) newDecorationCache(char string, highlight *Highlight, isNormalW
 	}
 	if highlight.underline {
 		pi.FillRect5(
-			int(start),
+			int(start)+w.scrollPixels[0],
 			int(float64((0+1)*font.lineHeight+scrollPixels))-weight,
 			int(math.Ceil(font.cellwidth)),
 			weight,
@@ -2135,7 +2154,7 @@ func (w *Window) newDecorationCache(char string, highlight *Highlight, isNormalW
 		phase := 0.0
 		Y := float64(0*font.lineHeight+scrollPixels) + float64(font.ascent+descent*0.3) + float64(font.lineSpace/2) + space
 		Y2 := Y + amplitude*math.Sin(0)
-		point := core.NewQPointF3(start, Y2)
+		point := core.NewQPointF3(start+float64(w.scrollPixels[0]), Y2)
 		path := gui.NewQPainterPath2(point)
 		for i := int(point.X()); i <= int(end); i++ {
 			Y2 = Y + amplitude*math.Sin(2*math.Pi*freq*float64(i)/font.cellwidth+phase)
@@ -2343,7 +2362,7 @@ func (w *Window) drawTextDecoration(p *gui.QPainter, y int, col int, cols int) {
 				// p.DrawLine(strikeLinef)
 				Y := float64(y*font.lineHeight+scrollPixels) + float64(font.ascent)*0.65 + float64(font.lineSpace/2)
 				p.FillRect5(
-					int(start),
+					int(start)+w.scrollPixels[0],
 					int(Y),
 					int(math.Ceil(font.cellwidth)),
 					weight,
@@ -2354,7 +2373,7 @@ func (w *Window) drawTextDecoration(p *gui.QPainter, y int, col int, cols int) {
 				// linef := core.NewQLineF3(start, Y, end, Y)
 				// p.DrawLine(linef)
 				p.FillRect5(
-					int(start),
+					int(start)+w.scrollPixels[0],
 					int(float64((y+1)*font.lineHeight+scrollPixels))-weight,
 					int(math.Ceil(font.cellwidth)),
 					weight,
@@ -2371,7 +2390,7 @@ func (w *Window) drawTextDecoration(p *gui.QPainter, y int, col int, cols int) {
 				phase := 0.0
 				Y := float64(y*font.lineHeight+scrollPixels) + float64(font.ascent+descent*0.3) + float64(font.lineSpace/2) + space
 				Y2 := Y + amplitude*math.Sin(0)
-				point := core.NewQPointF3(start, Y2)
+				point := core.NewQPointF3(start+float64(w.scrollPixels[0]), Y2)
 				path := gui.NewQPainterPath2(point)
 				for i := int(point.X()); i <= int(end); i++ {
 					Y2 = Y + amplitude*math.Sin(2*math.Pi*freq*float64(i)/font.cellwidth+phase)
@@ -2398,7 +2417,7 @@ func (w *Window) drawTextDecoration(p *gui.QPainter, y int, col int, cols int) {
 
 			p.DrawImage7(
 				core.NewQPointF3(
-					float64(x)*font.cellwidth,
+					float64(x)*font.cellwidth+float64(w.scrollPixels[0]),
 					float64(y*font.lineHeight)+float64(scrollPixels),
 				),
 				image,
