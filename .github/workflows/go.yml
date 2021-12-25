@@ -806,5 +806,5 @@ jobs:
       if: ${{ matrix.qtversion == '5.14.1' }}
       uses: actions/upload-artifact@v1
       with:
-        name: Goneovim-latest-win64-${{ matrix.qtversion }}
+        name: Goneovim-latest-win64-${{ matrix.qtversion }}-msvc
         path: ${{ github.workspace }}/src/github.com/${{ github.repository }}/cmd/goneovim/deploy/windows
