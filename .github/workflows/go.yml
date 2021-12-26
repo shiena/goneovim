@@ -194,6 +194,7 @@ jobs:
     - name: Build for windows
       run: |
         cd ${{ github.workspace }}/src/github.com/${{ github.repository }}/cmd/goneovim
+        rm -fr ../../editor/moc*
         $(go env GOPATH)/bin/qtdeploy -ldflags "-X github.com/akiyosi/goneovim/editor.Version=${{ steps.version-linux.outputs.GONEOVIM_VERSION }}" -docker build windows_64_static
 
     - name: Archive
@@ -489,7 +490,7 @@ jobs:
       run: |
         cd ${{ github.workspace }}/src/github.com/${{ github.repository }}/cmd/goneovim/deploy
         mv darwin Goneovim-latest-macos
-        tar -jcvf Goneovim-latest-macos-bigsur.tar.bz2 Goneovim-latest-macos
+        tar -jcvf Goneovim-latest-macos.tar.bz2 Goneovim-latest-macos
 
     - name: Upload for macos
       uses: actions/upload-artifact@v1
