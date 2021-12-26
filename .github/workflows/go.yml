@@ -193,6 +193,8 @@ jobs:
 
     - name: Build for windows
       run: |
+        cd ${{ github.workspace }}/src/github.com/akiyosi
+        git clone https://github.com/akiyosi/w32.git
         cd ${{ github.workspace }}/src/github.com/${{ github.repository }}/cmd/goneovim
         rm -fr ../../editor/moc*
         $(go env GOPATH)/bin/qtdeploy -ldflags "-X github.com/akiyosi/goneovim/editor.Version=${{ steps.version-linux.outputs.GONEOVIM_VERSION }}" -docker build windows_64_static
