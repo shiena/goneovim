@@ -207,7 +207,7 @@ jobs:
       if: ${{ matrix.qtversion == '5.14.1' }}
       uses: actions/upload-artifact@v1
       with:
-        name: Goneovim-latest-linux
+        name: Goneovim-latest-linux-static
         path: ${{ github.workspace }}/src/github.com/${{ github.repository }}/cmd/goneovim/deploy/Goneovim-latest-linux.tar.bz2
 
   # build-archlinux:
