@@ -651,6 +651,8 @@ func (c *Cursor) update() {
 	c.updateContent(win)
 	c.updateRegion()
 
+	editor.putLog("cursor debug info::", "grid", c.gridid, "busy", c.isBusy, "width", c.Width(), "height", c.Height())
+
 	// Fix #119: Wrong candidate window position when using ibus
 	if runtime.GOOS == "linux" {
 		gui.QGuiApplication_InputMethod().Update(core.Qt__ImCursorRectangle)
