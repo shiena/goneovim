@@ -438,7 +438,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Install Qt for macOS
-      uses: jurplel/install-qt-action@d2c35b0f6f9acaf4713fa59e70a3df05497579c6
+      uses: jurplel/install-qt-action@dc2a39188ab727f5eb6b1962d978328cbed19d59
       with:
         version: ${{ matrix.qtversion }}
         host: mac
