@@ -216,9 +216,11 @@ func InitEditor(options Options, args []string) {
 	e.configDir = configDir
 	e.putLog("reading config")
 
-	// application
 	e.putLog("start    generating the application")
-	core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
+
+	enableHighDpi()
+
+	// application
 	e.app = widgets.NewQApplication(len(os.Args), os.Args)
 	e.ppid = os.Getppid()
 	e.putLog("finished generating the application")
@@ -356,6 +358,16 @@ func (e *Editor) putLog(v ...interface{}) {
 		fmt.Sprintf("%07.3f", float64(time.Now().UnixNano()/1000-e.startuptime)/1000),
 		strings.TrimRight(strings.TrimLeft(fmt.Sprintf("%v", v), "["), "]"),
 	)
+}
+
+func enableHighDpi() {
+	// For Windows
+	// https://github.com/equalsraf/neovim-qt/issues/391
+	if runtime.GOOS == "windows" {
+		_ = os.Setenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
+	} else {
+		core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
+	}
 }
 
 // addDockMenu add the action menu for app in the Dock.
