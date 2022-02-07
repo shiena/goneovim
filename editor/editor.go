@@ -365,9 +365,9 @@ func enableHighDpi() {
 	// https://github.com/equalsraf/neovim-qt/issues/391
 	if runtime.GOOS == "windows" {
 		_ = os.Setenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
-	} else {
-		core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 	}
+
+	core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 }
 
 // addDockMenu add the action menu for app in the Dock.
