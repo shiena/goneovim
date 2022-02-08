@@ -201,10 +201,8 @@ func (w *Window) paint(event *gui.QPaintEvent) {
 	// Set font
 	font := w.getFont()
 
-	// Set devicePixelRatio if it is not set
-	if w.devicePixelRatio == 0 {
-		w.devicePixelRatio = float64(p.PaintEngine().PaintDevice().DevicePixelRatio())
-	}
+	// Set devicePixelRatio
+	w.devicePixelRatio = float64(p.PaintEngine().PaintDevice().DevicePixelRatio())
 
 	rect := event.Rect()
 	col := int(float64(rect.Left()) / font.cellwidth)
