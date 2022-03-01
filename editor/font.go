@@ -65,6 +65,9 @@ func initFontNew(family string, size float64, lineSpace int, letterSpace float64
 
 	font.SetFixedPitch(true)
 	font.SetKerning(false)
+	font.SetHintingPreference(
+		(gui.QFont__HintingPreference)(editor.config.Editor.FontHintingMode),
+	)
 
 	width, height, ascent, italicWidth := fontSizeNew(font)
 

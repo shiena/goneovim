@@ -45,6 +45,7 @@ type editorConfig struct {
 	CacheSize                  int
 	Linespace                  int
 	Letterspace                float64
+	FontHintingMode            int
 	FontSize                   int
 	Mergin                     int
 	Gap                        int
@@ -302,6 +303,8 @@ func (c *gonvimConfig) init() {
 	default:
 		c.Editor.FontFamily = "Monospace"
 	}
+	// https://doc.qt.io/qt-5/qfont.html#HintingPreference-enum
+	c.Editor.FontHintingMode = 0
 	c.Editor.FontSize = 12
 	c.Editor.Linespace = 6
 
