@@ -437,6 +437,11 @@ jobs:
       with:
         go-version: ${{ matrix.go-version }}
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
     - name: Install Qt for macOS
       uses: jurplel/install-qt-action@v3
       with:
@@ -444,6 +449,7 @@ jobs:
         host: mac
         target: desktop
         dir: ${{ github.workspace }}
+        setup-python: false
         modules: 'qtcharts qtdatavis3d qtpurchasing qtvirtualkeyboard qtwebengine qtnetworkauth qtwebglplugin qtscript'
         # mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
 
