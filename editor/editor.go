@@ -220,7 +220,7 @@ func InitEditor(options Options, args []string) {
 	e.putLog("start    generating the application")
 	core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 	e.app = widgets.NewQApplication(len(os.Args), os.Args)
-	e.ppid = os.Getppid()
+	// e.ppid = os.Getppid()
 	e.putLog("finished generating the application")
 
 	// put shell environment
@@ -229,7 +229,7 @@ func InitEditor(options Options, args []string) {
 	e.putLog("setting environment variable")
 
 	// set application working directory path
-	e.setAppDirPath(home)
+	// e.setAppDirPath(home)
 	e.putLog("set working directory path")
 
 	e.extFontFamily = e.config.Editor.FontFamily
