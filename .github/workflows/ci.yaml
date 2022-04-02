@@ -1,7 +1,7 @@
 name: CI
 on: [push, pull_request]
 env:
-  cache-version: v1
+  cache-version: v2
 jobs:
   test-and-build-linux:
     strategy:
