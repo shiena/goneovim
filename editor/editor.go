@@ -161,6 +161,7 @@ func InitEditor(options Options, args []string) {
 
 	// create editor struct
 	editor = &Editor{
+		ppid:        os.Getppid(),
 		version:     Version,
 		args:        args,
 		opts:        options,
@@ -221,7 +222,6 @@ func InitEditor(options Options, args []string) {
 	e.putLog("start    generating the application")
 	core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
 	e.app = widgets.NewQApplication(len(os.Args), os.Args)
-	e.ppid = os.Getppid()
 	e.putLog("finished generating the application")
 
 	// put shell environment
