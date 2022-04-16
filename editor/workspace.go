@@ -633,7 +633,7 @@ func newWslProcess() (*nvim.Nvim, error) {
 
 	wslArgs := []string{
 		"$SHELL",
-		"-lic",
+		"-lc",
 		nvimargs,
 	}
 
