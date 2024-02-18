@@ -254,6 +254,10 @@ jobs:
       QT_QMAKE_DIR: /opt/homebrew/opt/qt@5/bin
     steps:
 
+    # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md#xcode
+    - name: Select Xcode version
+      run: sudo xcode-select -s '/Applications/Xcode_15.2.app/Contents/Developer'
+
     - name: Install Go
       uses: actions/setup-go@v5
       with:
