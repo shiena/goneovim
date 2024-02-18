@@ -91,7 +91,7 @@ darwin: ## Build binaries for MacOS using Vagrant.
 	@go generate && \
 	cd cmd/goneovim && \
 	$(GOQTDEPLOY) -vagrant build darwin/darwin && \
-	cp -pR ../../runtime $(DEPLOYMENT_WINDOWS)
+	cp -pR ../../runtime $(DEPLOYMENT_DARWIN)
 
 debug: ## Debug runs of the application using delve.
 	@test -f ./editor/moc.go & $(GOQTMOC) desktop ./cmd/goneovim && \
