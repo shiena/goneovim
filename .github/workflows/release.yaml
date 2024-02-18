@@ -252,6 +252,8 @@ jobs:
       QT_DEBUG: false
       GO111MODULE: on
       QT_QMAKE_DIR: /opt/homebrew/opt/qt@5/bin
+      GOOS: darwin
+      GOARCH: arm64
     steps:
 
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md#xcode
